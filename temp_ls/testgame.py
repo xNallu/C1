@@ -1,6 +1,7 @@
 import pygame
 import random 
 import button
+from pygame import mixer
 
 pygame.init()
 pygame.display.set_caption("Raging Rampage")
@@ -24,6 +25,7 @@ red = (255, 0, 0)
 green = (0, 255, 0)
 white = (255, 255, 255)
 orange = (226, 150, 62)
+black = (0, 0, 0)
 
 #game variables
 current_fighter = 1
@@ -54,6 +56,10 @@ defeat_img = pygame.image.load("images/icons/defeat.png").convert_alpha()
 sword_img = pygame.image.load("images/icons/cursor.png").convert_alpha()
 
 
+#loading sounds
+sword1 = mixer.music.load("images/sounds/sword1.mp3")
+sword2 = mixer.music.load("images/sounds/sword2.mp3")
+
 #func for drawing text
 def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col)
@@ -68,27 +74,32 @@ def draw_panel():
     # draw panel rect
     screen.blit(panel_img, (0, 360))
     #hero hp
-    draw_text(f"{hero.name} HP: {hero.hp}",font, red, 100, screen_height - bottom_panel + 10)
+    draw_text(f"{hero.name} HP: {hero.hp}",font, red, 100, screen_height - bottom_panel - 20)
     #Skeleton hp
     for count, i in enumerate(skeleton_list):
-        draw_text(f"{i.name} HP: {i.hp}",font, red, 450, (screen_height - bottom_panel + 10) + count * 30)
+        draw_text(f"{i.name} HP: {i.hp}",font, red, 450, (screen_height - bottom_panel - 20) + count * 30)
 
+#func for stat panel
 def draw_statpanel():
     screen.blit(statpanel_img, (700, 0))
 
+    draw_text("STATS",font, black, 760, 25)
+    draw_text("Attack: 5-15",font, orange, 732, 50)
+    draw_text(f"{hero.name} XP: {hero.xp}",font, orange, 732, 70)
 
 
 #Classes
 # fighter class
 # Properties for fighters
 class Fighter():
-    def __init__(self, x, y, name, max_hp, strength, potions):
+    def __init__(self, x, y, name, max_hp, strength, potions,xp):
         self.name = name
 
         #Stats
         self.max_hp = max_hp
         self.hp = max_hp
         self.strength = strength
+        self.xp = xp
 
         #Health pots
         self.start_potions = potions
@@ -194,12 +205,13 @@ class Fighter():
         target.hp -= damage
         #run enemy hurt anim
         target.hurt()
-
+        
         #check if target died
         if target.hp < 1:
             target.hp = 0
             target.alive = False
             target.death()
+            self.xp += 10
 
         #damage text
         damage_text = DamageText(target.rect.centerx, target.rect.y - 10, str(damage), red)
@@ -311,10 +323,10 @@ damage_text_group = pygame.sprite.Group()
 
 # INSTANCES
 #Making the fighter instances
-#POS/IMG/HP/STRENGTH/HPPOTS
-hero = Fighter(150, 240, "Hero", 30, 10, 3)
-skeleton1 = Fighter(400, 270, "Skeleton", 20, 5, 0)
-skeleton2 = Fighter(540, 260, "Skeleton", 20, 5, 0)
+#POS/IMG/HP/STRENGTH/HPPOTS/XP
+hero = Fighter(150, 240, "Hero", 30, 10, 3,0)
+skeleton1 = Fighter(400, 270, "Skeleton", 20, 5, 0,0)
+skeleton2 = Fighter(540, 260, "Skeleton", 20, 5, 0,0)
 
 # Skeleton instances
 skeleton_list = []
@@ -327,8 +339,8 @@ skeleton1_health_bar = HealthBar(370, 150, skeleton1.hp, skeleton1.max_hp)
 skeleton2_health_bar = HealthBar(505, 140, skeleton2.hp, skeleton2.max_hp)
 
 #button instances
-potion_button = button.Button(screen, 25, 380, potion_img, 60, 60)
-restart_button = button.Button(screen, 150, 120, restart_img, 120, 30)
+potion_button = button.Button(screen, 29, 393, potion_img, 50, 50)
+restart_button = button.Button(screen, 315, 80, restart_img, 120, 30)
 
 maingame = True
 while maingame:
@@ -342,6 +354,7 @@ while maingame:
     draw_panel()
     #draw statpanel
     draw_statpanel()
+    #draw healthbars
     hero_health_bar.draw(hero.hp)
     skeleton1_health_bar.draw(skeleton1.hp)
     skeleton2_health_bar.draw(skeleton2.hp)
@@ -383,7 +396,7 @@ while maingame:
 
 
     #how many pots
-    draw_text(str(hero.potions), font, red, 80, 425)
+    draw_text(str(hero.potions), font, red, 68, 382)
 
     if game_over == 0:
         #player action
@@ -449,9 +462,9 @@ while maingame:
     #check if game is over and display image
     if game_over != 0:
         if game_over == 1:
-            screen.blit(victory_img, (150, 50))
+            screen.blit(victory_img, (230, 10))
         if game_over == -1:
-            screen.blit(defeat_img, (200, 50))
+            screen.blit(defeat_img, (250, 10))
         if restart_button.draw():
             hero.reset()
             for skeleton in skeleton_list:
