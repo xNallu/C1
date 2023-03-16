@@ -203,6 +203,7 @@ class Fighter():
         target.hurt()
 
 
+        #Sword hit sounds
         pygame.mixer.init()
         sword1 = pygame.mixer.Sound("images/sounds/sword1.mp3")
         sword2 = pygame.mixer.Sound("images/sounds/sword2.mp3")
@@ -246,6 +247,7 @@ class Fighter():
         self.hp = self.max_hp
         self.frame_index = 0
         self.action = 0
+        self.xp = 0
         self.update_time = pygame.time.get_ticks()
 
 
@@ -469,6 +471,15 @@ while maingame:
     if game_over != 0:
         if game_over == 1:
             screen.blit(victory_img, (230, 10))
+
+            # IF WANT ENDLESS
+            #for skeleton in skeleton_list:
+            #    skeleton.reset()
+            #current_fighter = 1
+            #action_cooldown
+            #alive_skeletons = 2
+            #game_over = 0
+
         if game_over == -1:
             screen.blit(defeat_img, (250, 10))
         if restart_button.draw():
