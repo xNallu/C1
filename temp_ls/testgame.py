@@ -31,7 +31,7 @@ black = (0, 0, 0)
 current_fighter = 1
 total_fighters = 3
 action_cooldown = 0
-action_wait_time = 90
+action_wait_time = 80
 potion_effect = 15
 attack = False
 potion = False
@@ -54,11 +54,6 @@ victory_img = pygame.image.load("images/icons/victory.png").convert_alpha()
 defeat_img = pygame.image.load("images/icons/defeat.png").convert_alpha()
 #sword cursor
 sword_img = pygame.image.load("images/icons/cursor.png").convert_alpha()
-
-
-#loading sounds
-sword1 = mixer.music.load("images/sounds/sword1.mp3")
-sword2 = mixer.music.load("images/sounds/sword2.mp3")
 
 #func for drawing text
 def draw_text(text, font, text_col, x, y):
@@ -86,6 +81,7 @@ def draw_statpanel():
     draw_text("STATS",font, black, 760, 25)
     draw_text("Attack: 5-15",font, orange, 732, 50)
     draw_text(f"{hero.name} XP: {hero.xp}",font, orange, 732, 70)
+
 
 
 #Classes
@@ -205,6 +201,16 @@ class Fighter():
         target.hp -= damage
         #run enemy hurt anim
         target.hurt()
+
+
+        pygame.mixer.init()
+        sword1 = pygame.mixer.Sound("images/sounds/sword1.mp3")
+        sword2 = pygame.mixer.Sound("images/sounds/sword2.mp3")
+        sounds = [sword1, sword2]
+        selected_sound = random.choice(sounds)
+        selected_sound.play()
+
+
         
         #check if target died
         if target.hp < 1:
