@@ -44,6 +44,8 @@ game_over = 0
 #background img
 background_img = pygame.image.load("images/background/background.png").convert_alpha()
 mainmenu_img = pygame.image.load("images/background/mainmenu.png").convert_alpha()
+difficulty_img = pygame.image.load("images/background/difficultymenu.png").convert_alpha()
+optionsmenu_img = pygame.image.load("images/background/optionsmenu.png").convert_alpha()
 #panel image
 panel_img = pygame.image.load("images/panel/panel.png").convert_alpha()
 statpanel_img = pygame.image.load("images/panel/statpanel.png").convert_alpha()
@@ -53,6 +55,7 @@ restart_img = pygame.image.load("images/icons/restart.png").convert_alpha()
 play_img = pygame.image.load("images/icons/play.png").convert_alpha()
 options_img = pygame.image.load("images/icons/options.png").convert_alpha()
 quit_img = pygame.image.load("images/icons/quit.png").convert_alpha()
+back_img = pygame.image.load("images/icons/back.png").convert_alpha()
 #load win and lose image
 victory_img = pygame.image.load("images/icons/victory.png").convert_alpha()
 defeat_img = pygame.image.load("images/icons/defeat.png").convert_alpha()
@@ -71,6 +74,14 @@ def draw_bg():
 #func for drawing mainmenu
 def mainmenu_bg():
     screen.blit(mainmenu_img, (0, 0))
+
+#func for drawing difficulty menu
+def difficulty_bg():
+    screen.blit(difficulty_img, (0, 0))
+
+#func for drawing options menu
+def optionsmenu_bg():
+    screen.blit(optionsmenu_img, (0, 0))
 
 #func for drawing panel
 def draw_panel():
@@ -354,17 +365,26 @@ hero_health_bar = HealthBar(95, 150, hero.hp, hero.max_hp)
 skeleton1_health_bar = HealthBar(370, 150, skeleton1.hp, skeleton1.max_hp)
 skeleton2_health_bar = HealthBar(505, 140, skeleton2.hp, skeleton2.max_hp)
 
+
+### BUTTONS
 #button instances
 potion_button = button.Button(screen, 29, 393, potion_img, 50, 50)
 restart_button = button.Button(screen, 315, 80, restart_img, 120, 30)
 
+#menu buttons
 play_button = button.Button(screen, 332, 85, play_img, 240, 64)
 options_button = button.Button(screen, 332, 198, options_img, 240, 64)
 quit_button = button.Button(screen, 332, 301, quit_img, 240, 64)
+back_button = button.Button(screen, 0, 0, back_img, 150, 34)
+
+#difficulty play buttons
+normal_button = button.Button(screen, 118, 352, play_img, 195, 64)
 
 
 #State manager
 menu = True
+difficulty_menu = False
+options_menu = False
 maingame = False
 
 # MAIN MENU LOOP
@@ -374,12 +394,14 @@ while menu:
     #drawing menu
     mainmenu_bg()
 
+
     if play_button.draw():
         menu = False
-        maingame = True
+        difficulty_menu = True
     
     if options_button.draw():
-        pass
+        menu = False
+        options_menu = True
 
     if quit_button.draw():
         menu = False
@@ -396,6 +418,62 @@ while menu:
 
     pygame.display.update()
 
+# DIFFICULTY SCREEN LOOP
+while difficulty_menu:
+
+    clock.tick(fps)
+
+    #drawing difficulty select screen
+    difficulty_bg()
+
+
+    if normal_button.draw():
+        difficulty_menu = False
+        maingame = True
+
+    if back_button.draw():
+        print("test")
+        #menu = True
+        #difficulty_menu = False
+
+
+        # event checker loop
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            difficulty_menu = False
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            clicked = True
+        else:
+            clicked = False
+
+    pygame.display.update()
+
+
+while options_menu:
+
+    clock.tick(fps)
+
+    #drawing options menu
+    optionsmenu_bg()
+
+
+    if back_button.draw():
+        print("test")
+        #menu = True
+        #difficulty_menu = False
+
+        # event checker loop
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            options_menu = False
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            clicked = True
+        else:
+            clicked = False
+
+    pygame.display.update()
 
 
 # MAIN GAME LOOP
