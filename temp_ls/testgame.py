@@ -43,12 +43,16 @@ game_over = 0
 #loading images
 #background img
 background_img = pygame.image.load("images/background/background.png").convert_alpha()
+mainmenu_img = pygame.image.load("images/background/mainmenu.png").convert_alpha()
 #panel image
 panel_img = pygame.image.load("images/panel/panel.png").convert_alpha()
 statpanel_img = pygame.image.load("images/panel/statpanel.png").convert_alpha()
-#button image
+#button images
 potion_img = pygame.image.load("images/icons/potion.png").convert_alpha()
 restart_img = pygame.image.load("images/icons/restart.png").convert_alpha()
+play_img = pygame.image.load("images/icons/play.png").convert_alpha()
+options_img = pygame.image.load("images/icons/options.png").convert_alpha()
+quit_img = pygame.image.load("images/icons/quit.png").convert_alpha()
 #load win and lose image
 victory_img = pygame.image.load("images/icons/victory.png").convert_alpha()
 defeat_img = pygame.image.load("images/icons/defeat.png").convert_alpha()
@@ -63,6 +67,10 @@ def draw_text(text, font, text_col, x, y):
 #func for drawing bg
 def draw_bg():
     screen.blit(background_img, (0, 0))
+
+#func for drawing mainmenu
+def mainmenu_bg():
+    screen.blit(mainmenu_img, (0, 0))
 
 #func for drawing panel
 def draw_panel():
@@ -350,7 +358,47 @@ skeleton2_health_bar = HealthBar(505, 140, skeleton2.hp, skeleton2.max_hp)
 potion_button = button.Button(screen, 29, 393, potion_img, 50, 50)
 restart_button = button.Button(screen, 315, 80, restart_img, 120, 30)
 
-maingame = True
+play_button = button.Button(screen, 332, 85, play_img, 240, 64)
+options_button = button.Button(screen, 332, 198, options_img, 240, 64)
+quit_button = button.Button(screen, 332, 301, quit_img, 240, 64)
+
+
+#State manager
+menu = True
+maingame = False
+
+# MAIN MENU LOOP
+while menu:
+    clock.tick(fps)
+
+    #drawing menu
+    mainmenu_bg()
+
+    if play_button.draw():
+        menu = False
+        maingame = True
+    
+    if options_button.draw():
+        pass
+
+    if quit_button.draw():
+        menu = False
+
+        # event checker loop
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            menu = False
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            clicked = True
+        else:
+            clicked = False
+
+    pygame.display.update()
+
+
+
+# MAIN GAME LOOP
 while maingame:
 
     #setting fps to game
@@ -385,7 +433,7 @@ while maingame:
     attack = False
     potion = False
     target = None
-    #make sure mouse is visdible
+    #make sure mouse is visible
     pygame.mouse.set_visible(True)
     pos = pygame.mouse.get_pos()
     for count, skeleton in enumerate(skeleton_list):
