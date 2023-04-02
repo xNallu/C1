@@ -460,8 +460,8 @@ while options_menu:
 
     if back_button.draw():
         print("test")
-        #menu = True
-        #difficulty_menu = False
+        menu = True
+        options_menu = False
 
         # event checker loop
     for event in pygame.event.get():
