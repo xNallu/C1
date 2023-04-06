@@ -3,7 +3,13 @@ import random
 import button
 import sys
 import time
+import os
 from pygame import mixer
+
+#Mostly fix for VSC not importing assets.
+absFilePath = os.path.abspath(__file__)
+os.chdir( os.path.dirname(absFilePath) )
+
 
 pygame.init()
 pygame.mixer.init()
@@ -154,44 +160,48 @@ class Fighter():
         #temp list for all images
         temp_list = []
         #How many pictures there is in one animation
-        for i in range(4):
-        #Idle Image loading and scale // scaling size by * 2
-            img = pygame.image.load(f"images/{self.name}/idle/{i}.png")
-            img = pygame.transform.scale(img, (img.get_width() *2, img.get_height() * 2))
-            temp_list.append(img)
+        for filename in os.listdir(f"images/{self.name}/idle/"):
+            if filename.endswith(".png"):
+        #idle Image loading and scale // scaling size by * 2
+                img = pygame.image.load(f"images/{self.name}/idle/{filename}")
+                img = pygame.transform.scale(img, (img.get_width() *2, img.get_height() * 2))
+                temp_list.append(img)
         self.animation_list.append(temp_list)
 
         #ATTACK ANIMATION
         #temp list for all images
         temp_list = []
         #How many pictures there is in one animation
-        for i in range(4):
-        #Idle Image loading and scale // scaling size by * 2
-            img = pygame.image.load(f"images/{self.name}/attack/{i}.png")
-            img = pygame.transform.scale(img, (img.get_width() *2, img.get_height() * 2))
-            temp_list.append(img)
+        for filename in os.listdir(f"images/{self.name}/attack/"):
+            if filename.endswith(".png"):
+        #attack Image loading and scale // scaling size by * 2
+                img = pygame.image.load(f"images/{self.name}/attack/{filename}")
+                img = pygame.transform.scale(img, (img.get_width() *2, img.get_height() * 2))
+                temp_list.append(img)
         self.animation_list.append(temp_list)
 
         #Take hit ANIMATION
         #temp list for all images
         temp_list = []
         #How many pictures there is in one animation
-        for i in range(3):
-        #Idle Image loading and scale // scaling size by * 2
-            img = pygame.image.load(f"images/{self.name}/takehit/{i}.png")
-            img = pygame.transform.scale(img, (img.get_width() *2, img.get_height() * 2))
-            temp_list.append(img)
+        for filename in os.listdir(f"images/{self.name}/takehit/"):
+            if filename.endswith(".png"):
+        #take hit Image loading and scale // scaling size by * 2
+                img = pygame.image.load(f"images/{self.name}/takehit/{filename}")
+                img = pygame.transform.scale(img, (img.get_width() *2, img.get_height() * 2))
+                temp_list.append(img)
         self.animation_list.append(temp_list)
-        
+
         #death ANIMATION
         #temp list for all images
         temp_list = []
         #How many pictures there is in one animation
-        for i in range(5):
-        #Idle Image loading and scale // scaling size by * 2
-            img = pygame.image.load(f"images/{self.name}/death/{i}.png")
-            img = pygame.transform.scale(img, (img.get_width() *2, img.get_height() * 2))
-            temp_list.append(img)
+        for filename in os.listdir(f"images/{self.name}/death/"):
+            if filename.endswith(".png"):
+        #death Image loading and scale // scaling size by * 2
+                img = pygame.image.load(f"images/{self.name}/death/{filename}")
+                img = pygame.transform.scale(img, (img.get_width() *2, img.get_height() * 2))
+                temp_list.append(img)
         self.animation_list.append(temp_list)
 
 
@@ -312,7 +322,7 @@ class DamageText(pygame.sprite.Sprite):
           pygame.sprite.Sprite.__init__(self)
           self.image = font.render(damage, True, colour)
           self.rect = self.image.get_rect()
-          self.rect.center = (x, y)
+          self.rect.center = (x + 11, y)
           self.counter = 0
 
      def update(self):
@@ -320,7 +330,7 @@ class DamageText(pygame.sprite.Sprite):
         self.rect.y -= 1
         #delete text after a few s
         self.counter += 1
-        if self.counter > 30:
+        if self.counter > 40:
             self.kill()
 
      
@@ -560,7 +570,7 @@ while mainloop == True:
                 pygame.mouse.set_visible(False)
                 #show sword instead of cursor
                 screen.blit(sword_img, pos)
-                if clicked == True:
+                if clicked == True and skeleton.alive == True:
                     attack = True
                     target = skeleton_list[count]
 
@@ -576,6 +586,17 @@ while mainloop == True:
             #player action
             if hero.alive == True:
                 if current_fighter == 1:
+
+
+                    
+                    #drawing arrow for turn - left middle right and drawing the shaft of the arrow
+                    pygame.draw.polygon(screen, orange,[(115, 100), (145, 130), (175, 100)])
+                    rect_width = 15
+                    rect_height = 50
+                    rect_x = 115 + (175 - 115 - rect_width) / 2
+                    rect_y = 100 - rect_height
+                    pygame.draw.rect(screen, orange, (rect_x, rect_y, rect_width, rect_height))
+
                     action_cooldown += 1
                     if action_cooldown >= action_wait_time:
                         # look for player action
