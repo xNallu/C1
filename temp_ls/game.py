@@ -6,6 +6,7 @@ import time
 import os
 from pygame import mixer
 
+
 #Mostly fix for VSC not importing assets.
 absFilePath = os.path.abspath(__file__)
 os.chdir( os.path.dirname(absFilePath) )
@@ -30,6 +31,7 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 
 #fonts
 font = pygame.font.SysFont("Times New  Roman", 26)
+font1 = pygame.font.SysFont("Garamond", 26)
 red = (255, 0, 0)
 green = (0, 255, 0)
 white = (255, 255, 255)
@@ -46,8 +48,10 @@ attack = False
 potion = False
 clicked = False
 game_over = 0
+endless = False
 
-
+hitsound = 1
+musicvolume = 0.3
 
 #loading images
 #background img
@@ -62,9 +66,19 @@ statpanel_img = pygame.image.load("images/panel/statpanel.png").convert_alpha()
 potion_img = pygame.image.load("images/icons/potion.png").convert_alpha()
 restart_img = pygame.image.load("images/icons/restart.png").convert_alpha()
 play_img = pygame.image.load("images/icons/play.png").convert_alpha()
+normal_img = pygame.image.load("images/icons/normal.png").convert_alpha()
+expert_img = pygame.image.load("images/icons/expert.png").convert_alpha()
+master_img = pygame.image.load("images/icons/master.png").convert_alpha()
 options_img = pygame.image.load("images/icons/options.png").convert_alpha()
 quit_img = pygame.image.load("images/icons/quit.png").convert_alpha()
 back_img = pygame.image.load("images/icons/back.png").convert_alpha()
+up_img = pygame.image.load("images/icons/up.png").convert_alpha()
+down_img = pygame.image.load("images/icons/down.png").convert_alpha()
+volume_img = pygame.image.load("images/icons/volume.png").convert_alpha()
+endless_img = pygame.image.load("images/icons/endless.png").convert_alpha()
+select_img = pygame.image.load("images/icons/select.png").convert_alpha()
+yes_img = pygame.image.load("images/icons/yes.png").convert_alpha()
+no_img = pygame.image.load("images/icons/no.png").convert_alpha()
 #load win and lose image
 victory_img = pygame.image.load("images/icons/victory.png").convert_alpha()
 defeat_img = pygame.image.load("images/icons/defeat.png").convert_alpha()
@@ -82,6 +96,7 @@ gmusic3 = pygame.mixer.Sound("images/sounds/gmusic3.ogg")
 gmusic4 = pygame.mixer.Sound("images/sounds/gmusic4.ogg")
 gmusics = [gmusic1, gmusic2, gmusic3, gmusic4]
 selected_gmusic = random.choice(gmusics)
+selected_gmusic.set_volume(musicvolume)
 
 #func for drawing text
 def draw_text(text, font, text_col, x, y):
@@ -104,6 +119,21 @@ def difficulty_bg():
 def optionsmenu_bg():
     screen.blit(optionsmenu_img, (0, 0))
 
+#func for drawing volume image
+def volumecontrol():
+    screen.blit(volume_img, (231, 45))
+
+def volumecontrol1():
+    screen.blit(volume_img, (231, 120))
+
+#func for drawing endless image
+def endlesstoggle():
+    screen.blit(endless_img, (325, 250))
+
+#func for drawing select image
+def selectimg():
+    screen.blit(select_img, (440, 320))
+
 #func for drawing panel
 def draw_panel():
     # draw panel rect
@@ -122,6 +152,10 @@ def draw_statpanel():
     draw_text("Attack: 5-15",font, orange, 732, 50)
     draw_text(f"{hero.name} XP: {hero.xp}",font, orange, 732, 70)
 
+#func for volume changing
+def update_volume(musicvolume):
+    pygame.mixer.music.set_volume(musicvolume)
+    selected_gmusic.set_volume(musicvolume)
 
 
 #Classes
@@ -242,6 +276,8 @@ class Fighter():
         #deal dmg to enemy
         rand = random.randint(-5, 5)
         damage = self.strength + rand
+        if damage < 0:
+            damage = 1
         target.hp -= damage
         #run enemy hurt anim
         target.hurt()
@@ -252,8 +288,8 @@ class Fighter():
         sword2 = pygame.mixer.Sound("images/sounds/sword2.mp3")
         sounds = [sword1, sword2]
         selected_sound = random.choice(sounds)
+        selected_sound.set_volume(hitsound)
         selected_sound.play()
-
 
         
         #check if target died
@@ -397,37 +433,48 @@ skeleton2_health_bar = HealthBar(505, 140, skeleton2.hp, skeleton2.max_hp)
 potion_button = button.Button(screen, 29, 393, potion_img, 50, 50)
 restart_button = button.Button(screen, 315, 80, restart_img, 120, 30)
 
+volumeup1 = button.Button(screen, 331, 45, up_img, 56,56)
+volumedown1 = button.Button(screen, 175, 45, down_img, 56,56)
+volumeup2 = button.Button(screen, 331, 120, up_img, 56,56)
+volumedown2 = button.Button(screen, 175, 120, down_img, 56,56)
+
 #menu buttons
-play_button = button.Button(screen, 332, 85, play_img, 240, 64)
-options_button = button.Button(screen, 332, 198, options_img, 240, 64)
-quit_button = button.Button(screen, 332, 301, quit_img, 240, 64)
-back_button = button.Button(screen, 0, 0, back_img, 150, 34)
+play_button = button.Button(screen, 35, 50, play_img, 265, 100)
+options_button = button.Button(screen, 35, 164, options_img, 265, 100)
+quit_button = button.Button(screen, 35, 290, quit_img, 265, 100)
+back_button = button.Button(screen, 0, 0, back_img, 150, 50)
 
 #difficulty play buttons
-normal_button = button.Button(screen, 118, 352, play_img, 195, 64)
+normal_button = button.Button(screen, 10, 87, normal_img, 285, 115)
+expert_button = button.Button(screen, 320, 87, expert_img, 270, 115)
+master_button = button.Button(screen, 605, 95, master_img, 283, 105)
 
-
+#yes and no button
+yes_button = button.Button(screen, 445, 328, yes_img, 35, 35)
+no_button = button.Button(screen, 446, 328, no_img, 35, 35)
 
 #Game state manager
 # 1.Mmenu 2.Difficulty 3.Options 4.Mgame
 mode = "Mmenu"
 
 #Music for main menu
-if mode == "Mmenu":
-    pygame.mixer.music.play(loops = -1, fade_ms= 10000)
-    pygame.mixer.music.set_volume(0.3)
+#if mode == "Mmenu":
+pygame.mixer.music.play(loops = -1, fade_ms= 10000)
+pygame.mixer.music.set_volume(musicvolume)
 
 mainloop = True
 # MAIN Loop
 while mainloop == True:
     if mode == "Mmenu":
         clock.tick(fps)
+        
 
         #drawing menu
         mainmenu_bg()
 
         #Draws play button
         if play_button.draw():
+            time.sleep(0.1)
             mode = "Difficulty"
 
             #plays clicksound
@@ -468,8 +515,9 @@ while mainloop == True:
 
         #drawing difficulty select screen
         difficulty_bg()
+        draw_text("Hero HP/STR:",font1, black, 20,235)
 
-        #Draws play button
+        #Draws normal play button
         if normal_button.draw():
             mode = "Mgame"
 
@@ -478,6 +526,27 @@ while mainloop == True:
             #Stops menu music
             pygame.mixer.music.stop()
             selected_gmusic.play()
+
+        #Draws expert play button
+        if expert_button.draw():
+            mode = "Mgame"
+
+            #plays clicksound
+            clicksound.play()
+            #Stops menu music
+            pygame.mixer.music.stop()
+            selected_gmusic.play()
+
+        #Draws master play button
+        if master_button.draw():
+            mode = "Mgame"
+
+            #plays clicksound
+            clicksound.play()
+            #Stops menu music
+            pygame.mixer.music.stop()
+            selected_gmusic.play()
+
 
         #Draws back button
         if back_button.draw():
@@ -505,6 +574,61 @@ while mainloop == True:
 
         #drawing options menu
         optionsmenu_bg()
+
+        #drawing volume bars
+        volumecontrol()
+        volumecontrol1()
+
+        #endless image
+        endlesstoggle()
+        #select image
+        selectimg()
+
+
+        #drawing values for bars and endless text
+        mvolume_text = font.render(f"{int(musicvolume * 100)}%", True, white)
+        screen.blit(mvolume_text, (255, 55))
+        draw_text("Music Volume",font, white, 400, 55)
+
+        mvolume1_text = font.render(f"{int(hitsound * 100)}%", True, white)
+        screen.blit(mvolume1_text, (255, 130))
+        draw_text("Effects Volume",font, white, 400, 130)
+
+        draw_text("Endless",font, black, 425, 260)
+
+        #drawing UP/DOWN buttons for volume control
+        if volumeup1.draw():
+             
+            musicvolume += 0.05
+            if musicvolume > 1.0:
+                musicvolume = 1.0
+            update_volume(musicvolume)           
+
+        if volumeup2.draw():
+            hitsound += 0.1
+            if hitsound > 1.0:
+                hitsound = 1.0
+
+        if volumedown1.draw():
+
+            musicvolume -= 0.05
+            if musicvolume < 0:
+                musicvolume = 0.0
+            update_volume(musicvolume)
+
+        if volumedown2.draw():
+            hitsound -= 0.1
+            if hitsound < 0:
+                hitsound = 0.0
+
+        #yes no for endless button
+        if endless == False:
+            if no_button.draw():
+                endless = True
+
+        if endless == True:
+            if yes_button.draw():
+                endless = False
 
         #Draws back button
         if back_button.draw():
@@ -572,6 +696,7 @@ while mainloop == True:
                 screen.blit(sword_img, pos)
                 if clicked == True and skeleton.alive == True:
                     attack = True
+                    
                     target = skeleton_list[count]
 
 
@@ -619,6 +744,7 @@ while mainloop == True:
                                 #potion sound
                                 potionsound = pygame.mixer.Sound("images/sounds/bottle.ogg")
                                 potionsound.play()
+                                potionsound.set_volume(hitsound)
 
                                 damage_text = DamageText(hero.rect.centerx, hero.rect.y, str(heal_amount), green)
                                 damage_text_group.add(damage_text)
@@ -658,28 +784,50 @@ while mainloop == True:
             game_over = 1
 
         
-        #check if game is over and display image
+        #check if game is over and if endless mode is toggled // display image
         if game_over != 0:
-            if game_over == 1:
-                screen.blit(victory_img, (230, 10))
+            if endless == False:
+                if game_over == 1:
+                    screen.blit(victory_img, (230, 10))
 
-                # IF WANT ENDLESS
-                #for skeleton in skeleton_list:
-                #    skeleton.reset()
-                #current_fighter = 1
-                #action_cooldown
-                #alive_skeletons = 2
-                #game_over = 0
+                if game_over == -1:
+                    screen.blit(defeat_img, (250, 10))
+                
+                if restart_button.draw():
+                    hero.reset()
+                    for skeleton in skeleton_list:
+                        skeleton.reset()
+                    current_fighter = 1
+                    action_cooldown
+                    game_over = 0
 
-            if game_over == -1:
-                screen.blit(defeat_img, (250, 10))
-            if restart_button.draw():
-                hero.reset()
-                for skeleton in skeleton_list:
-                    skeleton.reset()
-                current_fighter = 1
-                action_cooldown
-                game_over = 0
+            if endless == True:
+                if game_over == 1:
+
+                    for skeleton in skeleton_list:
+                        skeleton.reset()
+                        skeleton.hp += 5
+                        skeleton.max_hp += 5
+                    current_fighter = 1
+                    action_cooldown
+                    alive_skeletons = 2
+                    game_over = 0
+
+                    hero.potions += 2
+  
+
+                if game_over == -1:
+                    screen.blit(defeat_img, (250, 10))
+                
+                if restart_button.draw():
+                    hero.reset()
+                    for skeleton in skeleton_list:
+                        skeleton.reset()
+                        skeleton.hp -= 5
+                        skeleton.max_hp -= 5
+                    current_fighter = 1
+                    action_cooldown
+                    game_over = 0
 
 
 
@@ -701,9 +849,10 @@ while mainloop == True:
                     mode = "Mmenu"
                     time.sleep(0.1)
                     #resumes menu music again
+                    pygame.mouse.set_visible(True)
                     pygame.mixer.stop()
                     pygame.mixer.music.play(loops = -1, fade_ms= 10000)
-                    pygame.mixer.music.set_volume(0.3)
+                    pygame.mixer.music.set_volume(musicvolume)
 
         pygame.display.update()
 
