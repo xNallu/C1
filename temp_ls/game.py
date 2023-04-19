@@ -282,7 +282,6 @@ class Fighter():
         #run enemy hurt anim
         target.hurt()
 
-
         #Sword hit sounds
         sword1 = pygame.mixer.Sound("images/sounds/sword1.mp3")
         sword2 = pygame.mixer.Sound("images/sounds/sword2.mp3")
@@ -411,7 +410,6 @@ damage_text_group = pygame.sprite.Group()
 #Making the fighter instances
 #POS/IMG/HP/STRENGTH/HPPOTS/XP
 
-
 hero = Fighter(150, 240, "Hero", 30, 10, 3,0)
 
 skeleton1 = Fighter(400, 270, "Skeleton", 20, 5, 0,0)
@@ -474,7 +472,7 @@ while mainloop == True:
 
         #Draws play button
         if play_button.draw():
-            time.sleep(0.1)
+            time.sleep(0.11)
             mode = "Difficulty"
 
             #plays clicksound
@@ -516,6 +514,48 @@ while mainloop == True:
         #drawing difficulty select screen
         difficulty_bg()
         draw_text("Hero HP/STR:",font1, black, 20,235)
+        draw_text("Hero HP/STR:",font1, black, 325,235)
+        draw_text("Hero HP/STR:",font1, black, 617,235) 
+
+        draw_text("30 | 10",font, orange, 200,235)
+        draw_text("25 | 7",font, orange, 505,235)
+        draw_text("20 | 5",font, orange, 797,235)
+
+
+        draw_text("Mob HP/STR:",font1, black, 20,265)
+        draw_text("Mob HP/STR:",font1, black, 325,265)
+        draw_text("Mob HP/STR:",font1, black, 617,265)
+        
+        draw_text("20 | 5",font, orange, 200,265)
+        draw_text("25 | 5",font, orange, 505,265)
+        draw_text("25 | 5",font, orange, 797,265)
+
+
+        draw_text("Start Potions:",font1, black, 20,295)
+        draw_text("Start Potions:",font1, black, 325,295)
+        draw_text("Start Potions:",font1, black, 617,295)
+
+        draw_text("3",font, orange, 200,295)
+        draw_text("2",font, orange, 505,295)
+        draw_text("2",font, orange, 797,295)
+
+
+        draw_text("Xp gain:",font1, black, 20,325)
+        draw_text("Xp gain:",font1, black, 325,325)
+        draw_text("Xp gain:",font1, black, 617,325)
+
+        draw_text("1x",font, orange, 200,325)
+        draw_text("1.5x",font, orange, 505,325)
+        draw_text("2x",font, orange, 797,325)
+
+
+        draw_text("Pot. gain:",font1, black, 20,355)
+        draw_text("Pot. gain:",font1, black, 325,355)
+        draw_text("Pot. gain:",font1, black, 617,355)
+
+        draw_text("+2",font, orange, 200,355)
+        draw_text("+2",font, orange, 505,355)
+        draw_text("+1",font, orange, 797,355)
 
         #Draws normal play button
         if normal_button.draw():
@@ -540,6 +580,16 @@ while mainloop == True:
         #Draws master play button
         if master_button.draw():
             mode = "Mgame"
+
+            #Spawns goblins instead of skeletons on master mode
+            skeleton1 = Fighter(400, 270, "Goblin", 25, 5, 0,0)
+            skeleton2 = Fighter(540, 260, "Goblin", 25, 5, 0,0)
+
+            # Skeleton instances
+            skeleton_list = []
+            skeleton_list.append(skeleton1)
+            skeleton_list.append(skeleton2)
+
 
             #plays clicksound
             clicksound.play()
@@ -668,8 +718,10 @@ while mainloop == True:
         skeleton2_health_bar.draw(skeleton2.hp)
 
         #draw fighters
+
         hero.update()
         hero.draw()
+
         for skeleton in skeleton_list:
             skeleton.draw()
             skeleton.update()
@@ -751,6 +803,11 @@ while mainloop == True:
 
                                 current_fighter += 1
                                 action_cooldown = 0    
+
+                        # TEMP FOR DEMO !!!!!
+                        if hero.xp == 80:
+                            hero = Fighter(150, 240, "King", 50, 10, 3,0)
+                        
             else:
                 game_over = -1
 
@@ -789,10 +846,10 @@ while mainloop == True:
             if endless == False:
                 if game_over == 1:
                     screen.blit(victory_img, (230, 10))
-
+                    
                 if game_over == -1:
                     screen.blit(defeat_img, (250, 10))
-                
+                    
                 if restart_button.draw():
                     hero.reset()
                     for skeleton in skeleton_list:
